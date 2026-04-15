@@ -1,0 +1,23 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"indentWidth": 4,
+		"lineWidth": 80
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "single",
+			"trailingCommas": "all",
+			"bracketSpacing": true,
+			"bracketSameLine": false
+		}
+	},
+	"linter": {
+		"enabled": false  
+	},
+	"files": {
+		"includes": ["**", "!build/**", "!node_modules/**"]
+	}
+}

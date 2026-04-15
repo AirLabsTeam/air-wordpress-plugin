@@ -1,0 +1,20 @@
+---
+services:
+    php:
+        image: webdevops/php-nginx:7.4
+        ports:
+            - '4080:80'
+            - '4443:443'
+        volumes:
+            - ./:/app
+            # Set NEXT_WP_PLUGIN_DIR to the absolute path of plugins/wordpress
+            # e.g. export NEXT_WP_PLUGIN_DIR=~/path/to/next/plugins/wordpress
+            - ${NEXT_WP_PLUGIN_DIR}:/next/plugins/wordpress
+        platform: linux/x86_64
+    mariadb:
+        image: mariadb:10.6
+        environment:
+            - MARIADB_ROOT_PASSWORD=root
+            - MARIADB_USER=wordpress
+            - MARIADB_PASSWORD=wordpress
+            - MARIADB_DATABASE=wordpress

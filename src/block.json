@@ -1,0 +1,28 @@
+{
+	"$schema": "https://json.schemastore.org/block.json",
+	"apiVersion": 3,
+	"name": "air-inc/asset-picker",
+	"title": "Air Asset Picker",
+	"description": "Select and embed assets from Air",
+	"category": "media",
+	"icon": "airplane",
+	"textdomain": "example-air",
+	"supports": {
+		"html": false
+	},
+	"attributes": {
+		"url": {
+			"type": "string"
+		},
+		"caption": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"example": {
+		"attributes": {
+			"url": "https://placecats.com/300/300"
+		}
+	},
+	"editorScript": "file:./index.js"
+}
