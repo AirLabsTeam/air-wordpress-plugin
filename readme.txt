@@ -18,7 +18,7 @@ Air Asset Picker is a Gutenberg block plugin that connects your WordPress site t
 
 * Add the "Air Media" block to any page or post
 * Click "Browse Air" to open the Air asset picker
-* Log in to your Air account (first time only)
+* Log in to your Air account
 * Browse or search your workspace and select an asset
 * The asset is embedded via Air's CDN URL — no files are stored in WordPress
 
@@ -28,7 +28,7 @@ Assets are served directly from Air's CDN. This means no storage overhead in Wor
 
 **Requirements:**
 
-* An active Air account (Pro plan or above)
+* An active Air account
 * Your Air workspace ID (found in your Air account settings)
 
 == Installation ==
@@ -46,7 +46,7 @@ Log in to your Air account, go to your workspace settings, and copy the workspac
 
 = Do I need an Air account? =
 
-Yes. This plugin requires an active Air account on a Pro plan or above. Visit [air.inc](https://air.inc) to learn more.
+Yes. This plugin requires an active Air account. Visit [air.inc](https://air.inc) to learn more.
 
 = Does this upload files to WordPress? =
 
@@ -58,9 +58,13 @@ The Gutenberg block editor (WordPress 6.3+). The classic TinyMCE editor is not s
 
 == Screenshots ==
 
-1. The Air Media block in the Gutenberg editor
-2. The Air asset picker modal
-3. Settings → Air Media configuration page
+1. Air Asset Picker listed on the WordPress Plugins page
+2. Settings → Air Media page for entering your workspace ID
+3. Adding the Air Media block from the Gutenberg block inserter
+4. The Air asset picker gallery — browse and search your workspace
+5. Log in to your Air account from within the block editor
+6. Preview an asset before inserting it
+7. An Air asset embedded in a WordPress page via CDN URL
 
 == Changelog ==
 
