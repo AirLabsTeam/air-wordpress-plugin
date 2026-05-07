@@ -62,16 +62,19 @@ export default function Edit({ attributes: { asset }, setAttributes }) {
 					});
 					break;
 
-				// Picker needs a browser tab opened for OAuth / SAML
+				// Picker needs a browser tab opened for OAuth / SAML.
+				// Try a synthesised anchor click first — some browsers allow it from a
+				// message handler. If the tab opens, visibilitychange fires and we clear
+				// the Notice. If it doesn't, the Notice stays so the user can click through
+				// with a trusted gesture.
 				case 'air-to-host:open-url': {
 					const url = payload.data?.url;
 					if (!url) {
 						break;
 					}
 
-					// window.open() from a message handler is not a trusted user gesture,
-					// so most browsers block it as a popup. Synthesising a link click is
-					// treated more leniently by Chrome/Firefox.
+					setPendingAuthUrl(url);
+
 					const a = document.createElement('a');
 					a.href = url;
 					a.target = '_blank';
@@ -80,16 +83,11 @@ export default function Edit({ attributes: { asset }, setAttributes }) {
 					a.click();
 					document.body.removeChild(a);
 
-					// Fall back to the manual-link notice if the tab still didn't open.
-					// We use a short delay so the click has time to fire first.
-					const timer = setTimeout(() => {
-						setPendingAuthUrl(url);
-					}, 500);
-
-					// Clear the fallback if the page visibilitychange fires (tab opened OK).
 					const onVisible = () => {
-						clearTimeout(timer);
-						document.removeEventListener('visibilitychange', onVisible);
+						if (document.visibilityState === 'hidden') {
+							setPendingAuthUrl(null);
+							document.removeEventListener('visibilitychange', onVisible);
+						}
 					};
 					document.addEventListener('visibilitychange', onVisible);
 					break;
@@ -194,15 +192,14 @@ export default function Edit({ attributes: { asset }, setAttributes }) {
 										pointerEvents: 'auto',
 									}}
 								>
-									<Notice status="warning" isDismissible={false}>
-										{__('A pop-up was blocked.')}{' '}
+									<Notice status="info" isDismissible={false}>
 										<a
 											href={pendingAuthUrl}
 											target="_blank"
 											rel="noopener noreferrer"
 											onClick={() => setPendingAuthUrl(null)}
 										>
-											{__('Click here to open the sign-in window.')}
+											{__('Open sign-in in a new tab →')}
 										</a>
 									</Notice>
 								</div>

@@ -28,6 +28,22 @@ export default function save({ attributes: { asset } }) {
 		);
 	}
 
+	if (asset.type === 'document') {
+		return (
+			<figure {...useBlockProps.save()}>
+				<a href={displayUrl}>{asset.title || asset.caption}</a>
+			</figure>
+		);
+	}
+
+	if (asset.type === 'audio') {
+		return null;
+	}
+
+	if (asset.type !== 'image') {
+		return null;
+	}
+
 	return (
 		<figure {...useBlockProps.save()}>
 			<img
