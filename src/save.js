@@ -1,5 +1,5 @@
 import { useBlockProps } from '@wordpress/block-editor';
-import { getDisplayUrl } from './utils';
+import { getDisplayUrlForResolution } from './utils';
 
 /**
  * Renders the saved (static) HTML output of the Air Asset block.
@@ -9,20 +9,41 @@ import { getDisplayUrl } from './utils';
  * @param {Object|null} props.attributes.asset - The saved Air asset payload.
  * @return {JSX.Element|null} The rendered figure, or null if no asset is set.
  */
-export default function save({ attributes: { asset } }) {
+export default function save({ attributes: { asset, altText, resolution, displayWidth, displayHeight } }) {
 	if (!asset) {
 		return null;
 	}
 
-	const displayUrl = getDisplayUrl(asset.urls);
+	const displayUrl = getDisplayUrlForResolution(asset.urls, resolution);
 	if (!displayUrl) {
 		return null;
+	}
+
+	const width = displayWidth ?? asset.width;
+	const height = displayHeight ?? asset.height;
+
+	const sizeStyle = {};
+	if (width) {
+		sizeStyle.width = `${width}px`;
+	}
+	if (height) {
+		sizeStyle.height = `${height}px`;
+	}
+	if (width && height) {
+		sizeStyle.maxWidth = '100%';
 	}
 
 	if (asset.type === 'video') {
 		return (
 			<figure {...useBlockProps.save()}>
-				<video src={displayUrl} controls poster={asset.urls?.thumbnail} style={{ maxWidth: '100%' }} />
+				<video
+					src={displayUrl}
+					controls
+					poster={asset.urls?.thumbnail}
+					{...(width ? { width } : {})}
+					{...(height ? { height } : {})}
+					style={sizeStyle}
+				/>
 				{asset.caption && <figcaption>{asset.caption}</figcaption>}
 			</figure>
 		);
@@ -48,10 +69,11 @@ export default function save({ attributes: { asset } }) {
 		<figure {...useBlockProps.save()}>
 			<img
 				src={displayUrl}
-				alt={asset.alt || ''}
+				alt={altText || asset.alt || ''}
 				loading="lazy"
-				{...(asset.width ? { width: asset.width } : {})}
-				{...(asset.height ? { height: asset.height } : {})}
+				{...(width ? { width } : {})}
+				{...(height ? { height } : {})}
+				style={sizeStyle}
 			/>
 			{asset.caption && <figcaption>{asset.caption}</figcaption>}
 		</figure>

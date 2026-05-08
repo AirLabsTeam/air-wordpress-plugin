@@ -2,10 +2,9 @@
 	"$schema": "https://json.schemastore.org/block.json",
 	"apiVersion": 3,
 	"name": "air-inc/asset-picker",
-	"title": "Air Asset",
+	"title": "Air",
 	"description": "Embed an image or video asset from Air",
 	"category": "media",
-	"icon": "airplane",
 	"textdomain": "air-asset-picker",
 	"supports": {
 		"html": false
@@ -14,6 +13,20 @@
 		"asset": {
 			"type": "object",
 			"default": null
+		},
+		"altText": {
+			"type": "string",
+			"default": ""
+		},
+		"resolution": {
+			"type": "string",
+			"default": "full"
+		},
+		"displayWidth": {
+			"type": "number"
+		},
+		"displayHeight": {
+			"type": "number"
 		}
 	},
 	"example": {
