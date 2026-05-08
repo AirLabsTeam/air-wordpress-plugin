@@ -31,10 +31,15 @@ jobs:
       - name: Build assets (APP_ENV=${{ matrix.env }})
         run: APP_ENV=${{ matrix.env }} yarn build
 
-      - name: Create plugin zip
+      - name: Create plugin zip (folder name == zip basename)
         run: |
+          set -euo pipefail
+          SLUG="air-picker-${{ matrix.env }}"
           yarn plugin-zip
-          mv air-wordpress-plugin.zip "air-picker-${{ matrix.env }}.zip"
+          unzip -q air-wordpress-plugin.zip -d _stage
+          mv _stage/air-wordpress-plugin "_stage/${SLUG}"
+          (cd _stage && zip -rq "../${SLUG}.zip" "${SLUG}")
+          rm -rf air-wordpress-plugin.zip _stage
 
       - uses: actions/upload-artifact@v4
         with:
