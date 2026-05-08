@@ -3,7 +3,7 @@
  * Plugin Name: Air for WordPress
  * Plugin URI:  https://air.inc
  * Description: Sync or upload your Air assets to your WordPress website!
- * Version:     0.2.1
+ * Version:     0.2.2
  * Author:      Air Inc
  * Author URI:  https://air.inc
  * License:     GPL-2.0-or-later
