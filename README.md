@@ -1,5 +1,49 @@
 # Air WordPress Plugin
 
+## WordPress Playground (browser-only QA)
+
+Designers / PM can boot a disposable WordPress in the browser with the plugin
+preinstalled — no Docker, no local install. Each link below pulls the matching
+zip from the latest GitHub Release.
+
+| Env  | Open in Playground |
+|------|--------------------|
+| dev  | https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/AirLabsTeam/air-wordpress-plugin/main/blueprints/dev.json |
+| qa   | https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/AirLabsTeam/air-wordpress-plugin/main/blueprints/qa.json |
+| prod | https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/AirLabsTeam/air-wordpress-plugin/main/blueprints/prod.json |
+
+Login: `admin` / `password`. Lands on a new post; insert the **Air Asset
+Picker** block to test. State is ephemeral — refresh wipes the site.
+
+The blueprints bake a default `air_workspace_id` via `setSiteOptions`.
+Default workspace targets:
+
+| Env       | Workspace                                              |
+|-----------|--------------------------------------------------------|
+| dev / qa  | `QA Air Workspace` (`254754d4-15f8-4547-89f8-f27e64d40ffd`) on `api-qa.air.inc` |
+| prod      | `Air Workspace` (`77b00fde-3652-4bc3-8b7b-32a4f14617eb`) on `api.air.inc`       |
+
+To target a different workspace, edit the `air_workspace_id` value in the
+matching `blueprints/{dev,qa,prod}.json` file.
+
+### Cutting a release
+
+Tag a commit `v*` (e.g. `git tag v0.1.1 && git push --tags`). The
+`Release Plugin Builds` workflow builds three zips
+(`air-picker-development.zip`, `air-picker-qa.zip`, `air-picker-production.zip`)
+and attaches them to a GitHub Release. The Playground links above always
+resolve to the latest release.
+
+### Picker iframe / CORS notes
+
+- Each Air picker origin (`localhost:3007`, `qa.wordpress-plugin.air.inc`,
+  `wordpress-plugin.air.inc`) must allow being framed by
+  `https://playground.wordpress.net` (CSP `frame-ancestors`, no
+  `X-Frame-Options: DENY`).
+- API calls from the picker need CORS allow for the Playground origin.
+- `localhost:3007` will not work in Playground (browser cannot reach the
+  designer's localhost). Use the qa or prod link for Playground QA.
+
 ## Local development
 
 ### Prerequisites
