@@ -157,10 +157,16 @@ export default function Edit({
 					break;
 				}
 
-				// Asset selected — store full structured payload
+				// Asset selected — store full structured payload.
+				// Reset displayWidth/displayHeight to the new asset's natural size so
+				// the previous asset's resize values do not bleed onto the replacement.
 				case 'air-to-host:asset-selected':
 					if (payload.data) {
-						setAttributes({ asset: payload.data });
+						setAttributes({
+							asset: payload.data,
+							displayWidth: payload.data.width ?? undefined,
+							displayHeight: payload.data.height ?? undefined,
+						});
 						handleCloseModal();
 					}
 					break;
@@ -173,7 +179,11 @@ export default function Edit({
 				default:
 					// Backward-compat: handle flat payloads from older picker versions without a `type` field.
 					if (payload?.urls) {
-						setAttributes({ asset: payload });
+						setAttributes({
+							asset: payload,
+							displayWidth: payload.width ?? undefined,
+							displayHeight: payload.height ?? undefined,
+						});
 						handleCloseModal();
 					} else if (payload?.url) {
 						setAttributes({
@@ -191,6 +201,8 @@ export default function Edit({
 								width: null,
 								height: null,
 							},
+							displayWidth: undefined,
+							displayHeight: undefined,
 						});
 						handleCloseModal();
 					}
@@ -269,7 +281,9 @@ export default function Edit({
 								color: '#fff',
 								border: 'none',
 								borderRadius: 8,
-								padding: '10px 12px',
+								padding: '6px 12px',
+								height: 32,
+								boxSizing: 'border-box',
 								display: 'flex',
 								alignItems: 'center',
 								justifyContent: 'center',
@@ -334,19 +348,6 @@ export default function Edit({
 									>
 										<span
 											style={{
-												fontFamily: 'Inter, sans-serif',
-												fontWeight: 500,
-												fontSize: 12,
-												color: '#808080',
-												textTransform: 'uppercase',
-												letterSpacing: '0.6px',
-											}}
-										>
-											{(asset.type || 'image').toUpperCase()}
-										</span>
-										<span style={{ color: '#808080' }}>·</span>
-										<span
-											style={{
 												display: 'inline-flex',
 												alignItems: 'center',
 												gap: 4,
@@ -362,14 +363,14 @@ export default function Edit({
 										</span>
 									</div>
 									<div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-										{asset.urls?.selected && (
-											<ExternalLink href={asset.urls.selected}>
+										{asset.urls?.airDetail && (
+											<ExternalLink href={asset.urls.airDetail}>
 												{__('View in Air')}
 											</ExternalLink>
 										)}
 										<Button
 											variant="secondary"
-											size="small"
+											style={{ height: 32 }}
 											onClick={handleOpenModal}
 										>
 											{__('Replace image')}
@@ -615,7 +616,7 @@ export default function Edit({
 							/>
 						) : (
 							<img
-								src={asset.urls?.thumbnail || displayUrl}
+								src={displayUrl}
 								alt={altText || asset.alt || ''}
 								style={previewStyle}
 							/>
