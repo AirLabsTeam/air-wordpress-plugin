@@ -35,11 +35,13 @@ jobs:
         run: |
           set -euo pipefail
           SLUG="air-picker-${{ matrix.env }}"
-          yarn plugin-zip
-          unzip -q air-wordpress-plugin.zip -d _stage
-          mv _stage/air-wordpress-plugin "_stage/${SLUG}"
+          mkdir -p "_stage/${SLUG}"
+          cp index.php readme.txt README.md "_stage/${SLUG}/"
+          cp -r build "_stage/${SLUG}/build"
+          if [ -d assets ]; then cp -r assets "_stage/${SLUG}/assets"; fi
           (cd _stage && zip -rq "../${SLUG}.zip" "${SLUG}")
-          rm -rf air-wordpress-plugin.zip _stage
+          unzip -l "${SLUG}.zip"
+          rm -rf _stage
 
       - uses: actions/upload-artifact@v4
         with:
