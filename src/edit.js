@@ -12,7 +12,7 @@ import {
 import { createPortal, useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { AIR_PICKER_ORIGIN, AIR_WORKSPACE_ID } from './constants';
-import { getDisplayUrlForResolution } from './utils';
+import { getDisplayUrlForResolution, getRenderedDimensionsForResolution } from './utils';
 
 const pluginUrl = (window.airAssetPickerData && window.airAssetPickerData.pluginUrl) || '';
 
@@ -365,12 +365,12 @@ export default function Edit({
 									<div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
 										{(asset.urls?.airDetail || asset.urls?.selected) && (
 											<ExternalLink href={asset.urls.airDetail || asset.urls.selected}>
-												{__('View in Air')}
+												{__('View in AIR')}
 											</ExternalLink>
 										)}
 										<Button
 											variant="secondary"
-											style={{ height: 32 }}
+											size="compact"
 											onClick={handleOpenModal}
 										>
 											{__('Replace image')}
@@ -595,8 +595,17 @@ export default function Edit({
 			{asset && displayUrl && (
 				<figure style={{ margin: '16px 0' }}>
 					{(() => {
-						const w = displayWidth ?? asset.width;
-						const h = displayHeight ?? asset.height;
+						// For non-full resolutions, the imgix URL is already sized; the rendered
+						// <img> must match those dimensions so the image isn't upscaled back to
+						// its intrinsic size. `full` resolution falls through to user-resized
+						// (displayWidth/Height) or the asset's intrinsic dims.
+						const resolutionDims = getRenderedDimensionsForResolution(
+							resolution,
+							asset.width,
+							asset.height,
+						);
+						const w = resolutionDims.width ?? displayWidth ?? asset.width;
+						const h = resolutionDims.height ?? displayHeight ?? asset.height;
 						const previewStyle = {};
 						if (w) {
 							previewStyle.width = `${w}px`;
