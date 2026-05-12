@@ -368,10 +368,18 @@ export default function Edit({
 												{__('View in AIR')}
 											</ExternalLink>
 										)}
+										{/*
+											Replace button matches WP core "Set Featured Image" styling:
+											variant="secondary" (admin-theme blue outlined). Height pinned
+											inline at 32px instead of size="compact" because:
+											  - size="compact" is deprecated in @wordpress/components v29+
+											    (replaced by __next40pxDefaultSize, which renders 40px not 32px).
+											  - Inline height keeps the spec at 32px across WP versions.
+										*/}
 										<Button
 											variant="secondary"
-											size="compact"
 											onClick={handleOpenModal}
+											style={{ height: 32 }}
 										>
 											{__('Replace image')}
 										</Button>
