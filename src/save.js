@@ -1,5 +1,5 @@
 import { useBlockProps } from '@wordpress/block-editor';
-import { getDisplayUrlForResolution } from './utils';
+import { getDisplayUrlForResolution, getRenderedDimensionsForResolution } from './utils';
 
 /**
  * Renders the saved (static) HTML output of the Air Asset block.
@@ -19,8 +19,9 @@ export default function save({ attributes: { asset, altText, resolution, display
 		return null;
 	}
 
-	const width = displayWidth ?? asset.width;
-	const height = displayHeight ?? asset.height;
+	const resolutionDims = getRenderedDimensionsForResolution(resolution, asset.width, asset.height);
+	const width = resolutionDims.width ?? displayWidth ?? asset.width;
+	const height = resolutionDims.height ?? displayHeight ?? asset.height;
 
 	const sizeStyle = {};
 	if (width) {

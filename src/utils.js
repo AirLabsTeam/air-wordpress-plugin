@@ -25,6 +25,41 @@ const RESOLUTION_PARAMS = {
 };
 
 /**
+ * Target rendered dimensions per resolution. `null` = derive from asset's
+ * intrinsic size (preserve aspect ratio).
+ */
+const RESOLUTION_DIMENSIONS = {
+	thumbnail: { width: 150, height: 150 },
+	medium: { width: 300, height: null },
+	large: { width: 1024, height: null },
+	full: { width: null, height: null },
+};
+
+/**
+ * Returns the rendered <img> dimensions for the chosen resolution.
+ * For `medium`/`large`, height scales from the asset's aspect ratio.
+ * For `full`, both fall through so the caller can use user-resized dims.
+ *
+ * @param {string} resolution
+ * @param {number|null|undefined} assetWidth
+ * @param {number|null|undefined} assetHeight
+ * @return {{ width: number|null, height: number|null }}
+ */
+export function getRenderedDimensionsForResolution(resolution, assetWidth, assetHeight) {
+	const dims = RESOLUTION_DIMENSIONS[resolution] ?? RESOLUTION_DIMENSIONS.full;
+	if (dims.width && dims.height) {
+		return { width: dims.width, height: dims.height };
+	}
+	if (dims.width && assetWidth && assetHeight) {
+		return {
+			width: dims.width,
+			height: Math.round((dims.width * assetHeight) / assetWidth),
+		};
+	}
+	return { width: dims.width, height: dims.height };
+}
+
+/**
  * Builds an imgix URL for the given resolution from the raw imgix base.
  * Uses the URL API so existing query params (eg. an imgix `ixid`) are
  * preserved instead of being clobbered by naive string concatenation.
