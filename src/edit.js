@@ -365,7 +365,7 @@ export default function Edit({
 									<div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
 										{(asset.urls?.airDetail || asset.urls?.selected) && (
 											<ExternalLink href={asset.urls.airDetail || asset.urls.selected}>
-												{__('View in AIR')}
+												{__('View in Air')}
 											</ExternalLink>
 										)}
 										{/*
