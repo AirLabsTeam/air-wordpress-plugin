@@ -1,9 +1,9 @@
-=== Air for WordPress ===
+=== Air Asset Picker ===
 Contributors: airinc
 Tags: digital asset management, dam, brand assets, media library, block editor
 Requires at least: 6.3
 Tested up to: 6.9
-Stable tag: 0.2.8
+Stable tag: 0.2.9
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -12,7 +12,7 @@ Embed brand-approved images and videos from your Air workspace directly in the W
 
 == Description ==
 
-Air for WordPress is a Gutenberg block that connects your WordPress site to your Air workspace. Content editors can browse, search, and insert brand-approved images and videos from Air without ever leaving the WordPress block editor — no downloading, no re-uploading.
+Air Asset Picker is a Gutenberg block that connects your WordPress site to your Air workspace. Content editors can browse, search, and insert brand-approved images and videos from Air without ever leaving the WordPress block editor — no downloading, no re-uploading.
 
 **How it works:**
 
@@ -58,7 +58,7 @@ The Gutenberg block editor (WordPress 6.3+). The classic TinyMCE editor is not s
 
 == Screenshots ==
 
-1. Air for WordPress listed on the WordPress Plugins page
+1. Air Asset Picker listed on the WordPress Plugins page
 2. Settings → Air Media page for entering your workspace ID
 3. Adding the Air block from the Gutenberg block inserter
 4. The Air asset picker gallery — browse and search your workspace
@@ -90,6 +90,10 @@ This plugin connects to Air (https://air.inc) to enable asset selection and embe
 * Air Privacy Policy: [https://air.inc/privacy](https://air.inc/privacy)
 
 == Changelog ==
+
+= 0.2.9 =
+* Renamed plugin to "Air Asset Picker" to comply with WordPress.org trademark restrictions on the term "WordPress" in plugin names.
+* Added canonical submission build (`air-asset-picker.zip`) so the installed folder matches the plugin's text domain — resolves Plugin Check text-domain-mismatch errors.
 
 = 0.2.8 =
 * Readme prepared for WordPress.org submission: accurate short description, External Services disclosure, current changelog, updated screenshots and CTA references.
@@ -129,6 +133,9 @@ This plugin connects to Air (https://air.inc) to enable asset selection and embe
 * Image and video asset support with Air CDN delivery
 
 == Upgrade Notice ==
+
+= 0.2.9 =
+Plugin renamed to "Air Asset Picker" for WordPress.org compliance.
 
 = 0.2.8 =
 Readme cleanup ahead of WordPress.org submission.

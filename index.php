@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: Air for WordPress
+ * Plugin Name: Air Asset Picker
  * Plugin URI:  https://air.inc
  * Description: Embed brand-approved images and videos from your Air workspace directly in the WordPress block editor.
- * Version:     0.2.8
+ * Version:     0.2.9
  * Author:      Air Inc
  * Author URI:  https://air.inc
  * License:     GPL-2.0-or-later
@@ -128,9 +128,9 @@ function air_inc_plugin_info_payload( $with_sections = false ) {
 	$assets_url = plugins_url( 'assets', __FILE__ );
 
 	$info = (object) array(
-		'name'              => 'Air for WordPress',
+		'name'              => 'Air Asset Picker',
 		'slug'              => air_inc_plugin_slug(),
-		'version'           => '0.2.8',
+		'version'           => '0.2.9',
 		'author'            => '<a href="https://air.inc">Air Inc</a>',
 		'author_profile'    => 'https://air.inc',
 		'requires'          => '6.3',
@@ -172,7 +172,7 @@ function air_inc_plugin_info_payload( $with_sections = false ) {
 
 		$info->sections = array(
 			'description'  => '<blockquote><p>This plugin requires an active Air account on an Enterprise plan. Visit <a href="https://air.inc">air.inc</a> to learn more.</p></blockquote>'
-				. '<p>Air for WordPress is a Gutenberg block that connects your WordPress site to your Air workspace. Content editors can browse, search, and insert brand-approved images and videos from Air without ever leaving the WordPress block editor — no downloading, no re-uploading.</p>'
+				. '<p>Air Asset Picker is a Gutenberg block that connects your WordPress site to your Air workspace. Content editors can browse, search, and insert brand-approved images and videos from Air without ever leaving the WordPress block editor — no downloading, no re-uploading.</p>'
 				. '<h3>Features</h3>'
 				. '<ul>'
 				. '<li>Browse and search your Air workspace from inside the WordPress block editor.</li>'

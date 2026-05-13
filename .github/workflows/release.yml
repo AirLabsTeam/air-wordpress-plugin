@@ -49,6 +49,26 @@ jobs:
           path: air-picker-${{ matrix.env }}.zip
           if-no-files-found: error
 
+      - name: Create submission zip (production only — folder = canonical text-domain slug for WordPress.org)
+        if: matrix.env == 'production'
+        run: |
+          set -euo pipefail
+          SLUG="air-asset-picker"
+          mkdir -p "_stage/${SLUG}"
+          cp index.php readme.txt README.md "_stage/${SLUG}/"
+          cp -r build "_stage/${SLUG}/build"
+          if [ -d assets ]; then cp -r assets "_stage/${SLUG}/assets"; fi
+          (cd _stage && zip -rq "../${SLUG}.zip" "${SLUG}")
+          unzip -l "${SLUG}.zip"
+          rm -rf _stage
+
+      - uses: actions/upload-artifact@v4
+        if: matrix.env == 'production'
+        with:
+          name: air-asset-picker
+          path: air-asset-picker.zip
+          if-no-files-found: error
+
   release:
     name: Publish GitHub Release
     needs: build
