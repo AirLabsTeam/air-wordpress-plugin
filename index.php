@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Air for WordPress
  * Plugin URI:  https://air.inc
- * Description: Sync or upload your Air assets to your WordPress website!
- * Version:     0.2.7
+ * Description: Embed brand-approved images and videos from your Air workspace directly in the WordPress block editor.
+ * Version:     0.2.8
  * Author:      Air Inc
  * Author URI:  https://air.inc
  * License:     GPL-2.0-or-later
@@ -130,7 +130,7 @@ function air_inc_plugin_info_payload( $with_sections = false ) {
 	$info = (object) array(
 		'name'              => 'Air for WordPress',
 		'slug'              => air_inc_plugin_slug(),
-		'version'           => '0.2.0',
+		'version'           => '0.2.8',
 		'author'            => '<a href="https://air.inc">Air Inc</a>',
 		'author_profile'    => 'https://air.inc',
 		'requires'          => '6.3',
@@ -143,12 +143,14 @@ function air_inc_plugin_info_payload( $with_sections = false ) {
 		'last_updated'      => gmdate( 'Y-m-d' ),
 		'added'             => '2026-01-01',
 		'homepage'          => 'https://air.inc',
-		'short_description' => 'Sync or upload your Air assets to your WordPress website!',
+		'short_description' => 'Embed brand-approved images and videos from your Air workspace directly in the WordPress block editor.',
 		'download_link'     => '',
 		'tags'              => array(
-			'air'   => 'air',
-			'dam'   => 'dam',
-			'media' => 'media',
+			'digital asset management' => 'digital asset management',
+			'dam'                      => 'dam',
+			'brand assets'             => 'brand assets',
+			'media library'            => 'media library',
+			'block editor'             => 'block editor',
 		),
 		'icons'             => array(
 			'1x'      => $assets_url . '/icon-128x128.png',
@@ -163,22 +165,25 @@ function air_inc_plugin_info_payload( $with_sections = false ) {
 
 	if ( $with_sections ) {
 		$screenshots_html = '<ol>';
-		for ( $i = 1; $i <= 7; $i++ ) {
+		for ( $i = 1; $i <= 9; $i++ ) {
 			$screenshots_html .= '<li><img src="' . esc_url( $assets_url . "/screenshot-{$i}.png" ) . '" alt="" /></li>';
 		}
 		$screenshots_html .= '</ol>';
 
 		$info->sections = array(
-			'description'  => '<blockquote><p>This plugin requires a Brandfolder account which you can setup at <a href="https://brandfolder.com">Brandfolder.com</a></p></blockquote>'
-				. '<p>This plugin provides one block and is only compatible with the Gutenberg editor at time.</p>'
-				. '<h3>Features of the Brandfolder WordPress plugin</h3>'
+			'description'  => '<blockquote><p>This plugin requires an active Air account on an Enterprise plan. Visit <a href="https://air.inc">air.inc</a> to learn more.</p></blockquote>'
+				. '<p>Air for WordPress is a Gutenberg block that connects your WordPress site to your Air workspace. Content editors can browse, search, and insert brand-approved images and videos from Air without ever leaving the WordPress block editor — no downloading, no re-uploading.</p>'
+				. '<h3>Features</h3>'
 				. '<ul>'
-				. '<li>Edit your Brandfolders directly from your WordPress admin panel.</li>'
-				. '<li>Easily embed your Brandfolder using our Popup Embed on any widget, menu bar, page, or post.</li>'
+				. '<li>Browse and search your Air workspace from inside the WordPress block editor.</li>'
+				. '<li>Insert brand-approved images and videos with a single click.</li>'
+				. '<li>Assets are embedded via Air\'s CDN — no files are stored in WordPress.</li>'
+				. '<li>Updates to an asset in Air are reflected on your site immediately.</li>'
 				. '</ul>',
-			'installation' => '<ol><li>Activate the plugin.</li><li>Go to <strong>Settings → Air Media</strong> and enter your Air workspace ID.</li><li>Edit a page or post, add the <strong>Air Media</strong> block, and click <strong>Browse Air</strong>.</li></ol>',
+			'installation' => '<ol><li>Activate the plugin.</li><li>Go to <strong>Settings → Air Media</strong> and enter your Air workspace ID.</li><li>Edit a page or post, add the <strong>Air</strong> block, and click <strong>Add asset</strong>.</li></ol>',
 			'screenshots'  => $screenshots_html,
-			'changelog'    => '<h4>0.1.0</h4><ul><li>Initial release.</li></ul>',
+			'changelog'    => '<h4>0.2.7</h4><ul><li>Inspector button sizes match Figma spec.</li><li>Preview thumbnail pinned to 47×76 with center-crop.</li><li>CTAs unified as "Add asset".</li><li>Enterprise paywall copy updated.</li></ul>'
+				. '<h4>0.1.0</h4><ul><li>Initial release.</li></ul>',
 		);
 	}
 
