@@ -3,7 +3,7 @@
  * Plugin Name: Air Asset Picker
  * Plugin URI:  https://air.inc
  * Description: Embed brand-approved images and videos from your Air workspace directly in the WordPress block editor.
- * Version:     0.2.9
+ * Version:     0.2.10
  * Author:      Air Inc
  * Author URI:  https://air.inc
  * License:     GPL-2.0-or-later
@@ -130,7 +130,7 @@ function air_inc_plugin_info_payload( $with_sections = false ) {
 	$info = (object) array(
 		'name'              => 'Air Asset Picker',
 		'slug'              => air_inc_plugin_slug(),
-		'version'           => '0.2.9',
+		'version'           => '0.2.10',
 		'author'            => '<a href="https://air.inc">Air Inc</a>',
 		'author_profile'    => 'https://air.inc',
 		'requires'          => '6.3',
@@ -205,9 +205,9 @@ function air_inc_filter_plugin_information( $res, $action, $args ) {
 	if ( empty( $args->slug ) ) {
 		return $res;
 	}
-	$slug         = (string) $args->slug;
-	$stale_slugs  = array( 'air-wp', 'brandfolder', 'brandfolder-wordpress', 'air-asset-picker' );
-	if ( $slug === air_inc_plugin_slug() || in_array( strtolower( $slug ), $stale_slugs, true ) ) {
+	$slug        = strtolower( (string) $args->slug );
+	$stale_slugs = array( 'air-wp', 'brandfolder', 'brandfolder-wordpress' );
+	if ( in_array( $slug, $stale_slugs, true ) ) {
 		return air_inc_plugin_info_payload( true );
 	}
 	return $res;
@@ -294,7 +294,7 @@ function air_inc_is_stale_air_listing( $plugin ) {
 	$name   = strtolower( (string) $get( 'name' ) );
 	$short  = strtolower( wp_strip_all_tags( (string) $get( 'short_description' ) ) );
 
-	$stale_slugs = array( 'air-wp', 'brandfolder', 'brandfolder-wordpress', 'air-asset-picker' );
+	$stale_slugs = array( 'air-wp', 'brandfolder', 'brandfolder-wordpress' );
 	if ( in_array( $slug, $stale_slugs, true ) ) {
 		return true;
 	}

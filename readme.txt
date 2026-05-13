@@ -3,7 +3,7 @@ Contributors: airinc
 Tags: digital asset management, dam, brand assets, media library, block editor
 Requires at least: 6.3
 Tested up to: 6.9
-Stable tag: 0.2.9
+Stable tag: 0.2.10
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -91,6 +91,9 @@ This plugin connects to Air (https://air.inc) to enable asset selection and embe
 
 == Changelog ==
 
+= 0.2.10 =
+* Removed canonical slug `air-asset-picker` from the internal legacy-listing replacement filter so the plugin will not override its own WordPress.org plugin-info payload (auto-updates, ratings, and stats from WordPress.org are now authoritative once the plugin is listed there).
+
 = 0.2.9 =
 * Renamed plugin to "Air Asset Picker" to comply with WordPress.org trademark restrictions on the term "WordPress" in plugin names.
 * Added canonical submission build (`air-asset-picker.zip`) so the installed folder matches the plugin's text domain — resolves Plugin Check text-domain-mismatch errors.
@@ -133,6 +136,9 @@ This plugin connects to Air (https://air.inc) to enable asset selection and embe
 * Image and video asset support with Air CDN delivery
 
 == Upgrade Notice ==
+
+= 0.2.10 =
+Submission-blocker fix: plugin no longer overrides its own WordPress.org listing.
 
 = 0.2.9 =
 Plugin renamed to "Air Asset Picker" for WordPress.org compliance.
