@@ -1,7 +1,5 @@
 import { BlockControls, InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
-	Button,
-	ExternalLink,
 	Notice,
 	PanelBody,
 	SelectControl,
@@ -64,6 +62,39 @@ const SyncedIcon = () => (
 		/>
 	</svg>
 );
+
+const GoToIcon = () => (
+	<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+		<path
+			d="M6 3.5h6.5V10M12.5 3.5L6 10M3.5 6.5v6h6"
+			stroke="currentColor"
+			strokeWidth="1.4"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		/>
+	</svg>
+);
+
+const INSPECTOR_BUTTON_STYLE = {
+	display: 'inline-flex',
+	alignItems: 'center',
+	justifyContent: 'center',
+	gap: 4,
+	height: 32,
+	padding: '6px 10px',
+	border: '1px solid #dcdcdc',
+	background: '#fff',
+	color: '#202020',
+	fontFamily: 'Inter, sans-serif',
+	fontWeight: 600,
+	fontSize: 14,
+	lineHeight: 1.43,
+	cursor: 'pointer',
+	borderRadius: 0,
+	whiteSpace: 'nowrap',
+	flexShrink: 0,
+	boxSizing: 'border-box',
+};
 
 const LockIcon = () => (
 	<svg width="14" height="14" viewBox="0 0 18 18" fill="none" aria-hidden="true">
@@ -297,7 +328,7 @@ export default function Edit({
 							}}
 						>
 							<PlusIcon />
-							{__('Add assets')}
+							{__('Add asset')}
 						</button>
 					</div>
 				</div>
@@ -318,7 +349,7 @@ export default function Edit({
 							<div
 								style={{
 									display: 'flex',
-									gap: 12,
+									gap: 8,
 									alignItems: 'flex-start',
 									marginBottom: 12,
 								}}
@@ -328,61 +359,65 @@ export default function Edit({
 										src={asset.urls.thumbnail}
 										alt=""
 										style={{
-											width: 31,
-											height: 50,
+											width: 47,
+											height: 76,
 											objectFit: 'cover',
-											borderRadius: 2,
+											borderRadius: 0,
 											flexShrink: 0,
 										}}
 									/>
 								)}
-								<div style={{ flex: 1, minWidth: 0 }}>
+								<div
+									style={{
+										display: 'flex',
+										flexDirection: 'column',
+										gap: 8,
+										minWidth: 0,
+									}}
+								>
+									<button
+										type="button"
+										onClick={handleOpenModal}
+										style={{ ...INSPECTOR_BUTTON_STYLE, width: 119 }}
+									>
+										{__('Replace image')}
+									</button>
 									<div
 										style={{
 											display: 'flex',
 											gap: 6,
 											alignItems: 'center',
-											marginBottom: 8,
-											flexWrap: 'wrap',
 										}}
 									>
+										{(asset.urls?.airDetail || asset.urls?.selected) && (
+											<a
+												href={asset.urls.airDetail || asset.urls.selected}
+												target="_blank"
+												rel="noopener noreferrer"
+												style={{ ...INSPECTOR_BUTTON_STYLE, width: 113, textDecoration: 'none' }}
+											>
+												{__('View in Air')}
+												<GoToIcon />
+											</a>
+										)}
 										<span
 											style={{
 												display: 'inline-flex',
 												alignItems: 'center',
 												gap: 4,
+												padding: '1px 4px',
+												borderRadius: 4,
 												fontFamily: 'Inter, sans-serif',
 												fontWeight: 500,
 												fontSize: 12,
 												color: '#297c3b',
 												letterSpacing: '0.6px',
+												whiteSpace: 'nowrap',
 											}}
 										>
 											<SyncedIcon />
 											{__('Synced')}
 										</span>
-									</div>
-									<div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-										{(asset.urls?.airDetail || asset.urls?.selected) && (
-											<ExternalLink href={asset.urls.airDetail || asset.urls.selected}>
-												{__('View in Air')}
-											</ExternalLink>
-										)}
-										{/*
-											Replace button matches WP core "Set Featured Image" styling:
-											variant="secondary" (admin-theme blue outlined). Height pinned
-											inline at 32px instead of size="compact" because:
-											  - size="compact" is deprecated in @wordpress/components v29+
-											    (replaced by __next40pxDefaultSize, which renders 40px not 32px).
-											  - Inline height keeps the spec at 32px across WP versions.
-										*/}
-										<Button
-											variant="secondary"
-											onClick={handleOpenModal}
-											style={{ height: 32 }}
-										>
-											{__('Replace image')}
-										</Button>
 									</div>
 								</div>
 							</div>
