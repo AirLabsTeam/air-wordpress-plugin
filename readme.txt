@@ -3,7 +3,7 @@ Contributors: airinc
 Tags: digital asset management, dam, brand assets, media library, block editor
 Requires at least: 6.3
 Tested up to: 6.9
-Stable tag: 0.2.11
+Stable tag: 0.2.12
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -91,6 +91,9 @@ This plugin connects to Air (https://air.inc) to enable asset selection and embe
 
 == Changelog ==
 
+= 0.2.12 =
+* Replaced stock-photo screenshots (5–9) with Air-owned imagery and captured the recent QA design improvements.
+
 = 0.2.11 =
 * Removed the wp-admin plugin-directory filters (`plugins_api` / `plugins_api_result`) that previously replaced the WordPress.org search and details responses with a local payload. WordPress.org is now the sole source of plugin metadata, ratings, and updates.
 
@@ -139,6 +142,9 @@ This plugin connects to Air (https://air.inc) to enable asset selection and embe
 * Image and video asset support with Air CDN delivery
 
 == Upgrade Notice ==
+
+= 0.2.12 =
+Refreshed screenshots with Air-owned imagery.
 
 = 0.2.11 =
 Removed legacy plugin-directory filters ahead of WordPress.org submission.

@@ -3,7 +3,7 @@
  * Plugin Name: Air Asset Picker
  * Plugin URI:  https://air.inc
  * Description: Embed brand-approved images and videos from your Air workspace directly in the WordPress block editor.
- * Version:     0.2.11
+ * Version:     0.2.12
  * Author:      Air Inc
  * Author URI:  https://air.inc
  * License:     GPL-2.0-or-later
