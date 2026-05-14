@@ -1,0 +1,91 @@
+name: Release Plugin Builds
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build (${{ matrix.env }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [development, qa, production]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build assets (APP_ENV=${{ matrix.env }})
+        run: APP_ENV=${{ matrix.env }} yarn build
+
+      - name: Create plugin zip (folder name == zip basename)
+        run: |
+          set -euo pipefail
+          SLUG="air-picker-${{ matrix.env }}"
+          mkdir -p "_stage/${SLUG}"
+          cp index.php readme.txt README.md "_stage/${SLUG}/"
+          cp -r build "_stage/${SLUG}/build"
+          if [ -d assets ]; then cp -r assets "_stage/${SLUG}/assets"; fi
+          (cd _stage && zip -rq "../${SLUG}.zip" "${SLUG}")
+          unzip -l "${SLUG}.zip"
+          rm -rf _stage
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: air-picker-${{ matrix.env }}
+          path: air-picker-${{ matrix.env }}.zip
+          if-no-files-found: error
+
+      - name: Create submission zip (production only — folder = canonical text-domain slug for WordPress.org)
+        if: matrix.env == 'production'
+        run: |
+          set -euo pipefail
+          SLUG="air-asset-picker"
+          mkdir -p "_stage/${SLUG}"
+          cp index.php readme.txt README.md "_stage/${SLUG}/"
+          cp -r build "_stage/${SLUG}/build"
+          if [ -d assets ]; then cp -r assets "_stage/${SLUG}/assets"; fi
+          (cd _stage && zip -rq "../${SLUG}.zip" "${SLUG}")
+          unzip -l "${SLUG}.zip"
+          rm -rf _stage
+
+      - uses: actions/upload-artifact@v4
+        if: matrix.env == 'production'
+        with:
+          name: air-asset-picker
+          path: air-asset-picker.zip
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -la dist
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip
+          generate_release_notes: true

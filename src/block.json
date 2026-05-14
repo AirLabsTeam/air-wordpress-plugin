@@ -2,26 +2,49 @@
 	"$schema": "https://json.schemastore.org/block.json",
 	"apiVersion": 3,
 	"name": "air-inc/asset-picker",
-	"title": "Air Asset Picker",
-	"description": "Select and embed assets from Air",
+	"title": "Air",
+	"description": "Embed an image or video asset from Air",
 	"category": "media",
-	"icon": "airplane",
-	"textdomain": "example-air",
+	"textdomain": "air-asset-picker",
 	"supports": {
 		"html": false
 	},
 	"attributes": {
-		"url": {
-			"type": "string"
+		"asset": {
+			"type": "object",
+			"default": null
 		},
-		"caption": {
+		"altText": {
 			"type": "string",
 			"default": ""
+		},
+		"resolution": {
+			"type": "string",
+			"default": "full"
+		},
+		"displayWidth": {
+			"type": "number"
+		},
+		"displayHeight": {
+			"type": "number"
 		}
 	},
 	"example": {
 		"attributes": {
-			"url": "https://placecats.com/300/300"
+			"asset": {
+				"assetId": "example-123",
+				"type": "image",
+				"alt": "Example Air image",
+				"caption": "An example caption",
+				"urls": {
+					"thumbnail": "https://placecats.com/300/300",
+					"static": "https://placecats.com/800/600",
+					"dynamic": null,
+					"selected": "https://placecats.com/800/600"
+				},
+				"width": 800,
+				"height": 600
+			}
 		}
 	},
 	"editorScript": "file:./index.js"

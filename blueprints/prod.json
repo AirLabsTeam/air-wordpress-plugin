@@ -1,0 +1,32 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "landingPage": "/wp-admin/post-new.php?post_type=post",
+  "preferredVersions": {
+    "php": "8.2",
+    "wp": "latest"
+  },
+  "phpExtensionBundles": ["kitchen-sink"],
+  "features": {
+    "networking": true
+  },
+  "steps": [
+    {
+      "step": "login",
+      "username": "admin",
+      "password": "password"
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "url",
+        "url": "https://github.com/AirLabsTeam/air-wordpress-plugin/releases/latest/download/air-picker-production.zip"
+      }
+    },
+    {
+      "step": "setSiteOptions",
+      "options": {
+        "air_workspace_id": "77b00fde-3652-4bc3-8b7b-32a4f14617eb"
+      }
+    }
+  ]
+}

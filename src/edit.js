@@ -1,80 +1,690 @@
-import { useBlockProps } from '@wordpress/block-editor';
-import { Button, Modal } from '@wordpress/components';
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { BlockControls, InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	Notice,
+	PanelBody,
+	SelectControl,
+	TextareaControl,
+	ToolbarButton,
+	ToolbarGroup,
+} from '@wordpress/components';
+import { createPortal, useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { AIR_PICKER_ORIGIN } from './constants';
+import { AIR_PICKER_ORIGIN, AIR_WORKSPACE_ID } from './constants';
+import { getDisplayUrlForResolution, getRenderedDimensionsForResolution } from './utils';
 
-export default function Edit(props) {
-	const {
-		attributes: { url, caption },
-		setAttributes,
-	} = props;
+const pluginUrl = (window.airpickerData && window.airpickerData.pluginUrl) || '';
 
+const PlusIcon = () => (
+	<svg
+		aria-hidden="true"
+		focusable="false"
+		width="16"
+		height="16"
+		viewBox="0 0 16 16"
+		fill="none"
+		xmlns="http://www.w3.org/2000/svg"
+	>
+		<path
+			d="M8 3.333v9.334M3.333 8h9.334"
+			stroke="currentColor"
+			strokeWidth="1.6"
+			strokeLinecap="round"
+		/>
+	</svg>
+);
+
+/**
+ * Sends a typed postMessage to the Air picker iframe.
+ *
+ * @param {Window} iframeWindow - The contentWindow of the picker iframe.
+ * @param {string} type         - The message type (e.g. 'host-to-air:init').
+ * @param {Object} data         - Optional payload to include with the message.
+ */
+function sendToIframe(iframeWindow, type, data = {}) {
+	iframeWindow.postMessage(JSON.stringify({ type, data }), AIR_PICKER_ORIGIN);
+}
+
+const RESOLUTION_OPTIONS = [
+	{ label: __('Full size'), value: 'full' },
+	{ label: __('Large'), value: 'large' },
+	{ label: __('Medium'), value: 'medium' },
+	{ label: __('Thumbnail'), value: 'thumbnail' },
+];
+
+const SyncedIcon = () => (
+	<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+		<path
+			d="M3.5 8.5l3 3 6-6"
+			stroke="#297c3b"
+			strokeWidth="1.6"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		/>
+	</svg>
+);
+
+const GoToIcon = () => (
+	<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+		<path
+			d="M6 3.5h6.5V10M12.5 3.5L6 10M3.5 6.5v6h6"
+			stroke="currentColor"
+			strokeWidth="1.4"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		/>
+	</svg>
+);
+
+const INSPECTOR_BUTTON_STYLE = {
+	display: 'inline-flex',
+	alignItems: 'center',
+	justifyContent: 'center',
+	gap: 4,
+	height: 32,
+	padding: '6px 10px',
+	border: '1px solid #dcdcdc',
+	background: '#fff',
+	color: '#202020',
+	fontFamily: 'Inter, sans-serif',
+	fontWeight: 600,
+	fontSize: 14,
+	lineHeight: 1.43,
+	cursor: 'pointer',
+	borderRadius: 0,
+	whiteSpace: 'nowrap',
+	flexShrink: 0,
+	boxSizing: 'border-box',
+};
+
+const LockIcon = () => (
+	<svg width="14" height="14" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+		<path
+			d="M5.25 8V5.25a3.75 3.75 0 117.5 0V8M4 8h10v6.5H4V8z"
+			stroke="#666"
+			strokeWidth="1.4"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		/>
+	</svg>
+);
+
+export default function Edit({
+	attributes: { asset, altText, resolution, displayWidth, displayHeight },
+	setAttributes,
+}) {
 	const airFrame = useRef(null);
-
 	const [isOpen, setOpen] = useState(false);
-	const handleOpenModal = () => setOpen(true);
-	const handleCloseModal = useCallback(() => setOpen(false), []);
+	const [pendingAuthUrl, setPendingAuthUrl] = useState(null);
+	const handleOpenModal = useCallback( () => setOpen(true), [] );
+	const handleCloseModal = useCallback(() => {
+		setOpen(false);
+		setPendingAuthUrl(null);
+	}, []);
+
+	useEffect(() => {
+		if (!isOpen) {
+			return;
+		}
+		const handleKeyDown = (e) => {
+			if (e.key === 'Escape') {
+				handleCloseModal();
+			}
+		};
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [isOpen, handleCloseModal]);
 
 	useEffect(() => {
 		const handleMessage = (message) => {
-			if (
-				!airFrame.current ||
-				message.source !== airFrame.current.contentWindow
-			) {
+			if (!airFrame.current || message.source !== airFrame.current.contentWindow) {
 				return;
 			}
 
-			// Validate origin before trusting the payload
 			if (message.origin !== AIR_PICKER_ORIGIN) {
-				console.warn('Untrusted postMessage origin:', message.origin);
+				console.warn('[Air] Untrusted postMessage origin:', message.origin);
 				return;
 			}
 
-			try {
-				const payload = JSON.parse(message.data);
-				if (payload?.url) {
-					setAttributes({
-						url: payload.url,
-						caption: payload.caption ?? '',
+			const payload = typeof message.data === 'string' ? JSON.parse(message.data) : message.data;
+
+			switch (payload?.type) {
+				// Picker is ready — send Init with workspaceId so auth polling works
+				case 'air-to-host:ready':
+					sendToIframe(airFrame.current.contentWindow, 'host-to-air:init', {
+						workspaceId: AIR_WORKSPACE_ID,
+						hostOrigin: window.location.origin,
+						protocolVersion: 1,
 					});
-					handleCloseModal();
+					break;
+
+				// Picker needs a browser tab opened for OAuth / SAML.
+				// Try a synthesised anchor click first — some browsers allow it from a
+				// message handler. If the tab opens, visibilitychange fires and we clear
+				// the Notice. If it doesn't, the Notice stays so the user can click through
+				// with a trusted gesture.
+				case 'air-to-host:open-url': {
+					const url = payload.data?.url;
+					if (!url) {
+						break;
+					}
+
+					setPendingAuthUrl(url);
+
+					const a = document.createElement('a');
+					a.href = url;
+					a.target = '_blank';
+					a.rel = 'noopener noreferrer';
+					document.body.appendChild(a);
+					a.click();
+					document.body.removeChild(a);
+
+					const onVisible = () => {
+						if (document.visibilityState === 'hidden') {
+							setPendingAuthUrl(null);
+							document.removeEventListener('visibilitychange', onVisible);
+						}
+					};
+					document.addEventListener('visibilitychange', onVisible);
+					break;
 				}
-			} catch (e) {
-				console.error('Invalid postMessage payload', e);
+
+				// Asset selected — store full structured payload.
+				// Reset displayWidth/displayHeight to the new asset's natural size so
+				// the previous asset's resize values do not bleed onto the replacement.
+				case 'air-to-host:asset-selected':
+					if (payload.data) {
+						setAttributes({
+							asset: payload.data,
+							displayWidth: payload.data.width ?? undefined,
+							displayHeight: payload.data.height ?? undefined,
+						});
+						handleCloseModal();
+					}
+					break;
+
+				// Picker asked to close
+				case 'air-to-host:close':
+					handleCloseModal();
+					break;
+
+				default:
+					// Backward-compat: handle flat payloads from older picker versions without a `type` field.
+					if (payload?.urls) {
+						setAttributes({
+							asset: payload,
+							displayWidth: payload.width ?? undefined,
+							displayHeight: payload.height ?? undefined,
+						});
+						handleCloseModal();
+					} else if (payload?.url) {
+						setAttributes({
+							asset: {
+								assetId: payload.assetId ?? null,
+								type: payload.other_metadata?.type ?? 'image',
+								alt: payload.caption ?? '',
+								caption: payload.caption ?? '',
+								urls: {
+									thumbnail: payload.url,
+									static: payload.url,
+									dynamic: null,
+									selected: payload.url,
+								},
+								width: null,
+								height: null,
+							},
+							displayWidth: undefined,
+							displayHeight: undefined,
+						});
+						handleCloseModal();
+					}
 			}
 		};
 
 		window.addEventListener('message', handleMessage);
-		return () => {
-			window.removeEventListener('message', handleMessage);
-		};
+		return () => window.removeEventListener('message', handleMessage);
 	}, [setAttributes, handleCloseModal]);
+
+	const displayUrl = asset ? getDisplayUrlForResolution(asset.urls, resolution) : null;
 
 	return (
 		<div {...useBlockProps()}>
-			<Button variant="secondary" onClick={handleOpenModal}>
-				{url ? __('Replace Air asset') : __('Browse Air')}
-			</Button>
-			{isOpen && (
-				<Modal title="Air" size="large" onRequestClose={handleCloseModal}>
-					<iframe
-						title="Air asset picker"
-						src={AIR_PICKER_ORIGIN}
-						ref={airFrame}
+			{!asset && (
+				<div
+					style={{
+						background: '#fff',
+						border: '1px solid #000',
+						borderRadius: 4,
+						padding: '10px 16px',
+						minHeight: 152,
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'flex-start',
+						justifyContent: 'center',
+					}}
+				>
+					<div
 						style={{
-							width: '100%',
-							height: '70vh',
-							border: 'none',
-							display: 'block',
+							display: 'flex',
+							flexDirection: 'column',
+							gap: 16,
+							width: 141,
 						}}
-					/>
-				</Modal>
+					>
+						<div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+							{pluginUrl && (
+								<img
+									src={`${pluginUrl}assets/icon-128x128.png`}
+									alt=""
+									width={24}
+									height={24}
+									style={{ display: 'block', borderRadius: 2 }}
+								/>
+							)}
+							<span
+								style={{
+									fontFamily: 'Inter, sans-serif',
+									fontWeight: 600,
+									fontSize: 14,
+									lineHeight: 1.43,
+									color: '#000',
+								}}
+							>
+								{__('Air')}
+							</span>
+						</div>
+						<p
+							style={{
+								margin: 0,
+								fontFamily: 'Inter, sans-serif',
+								fontWeight: 400,
+								fontSize: 12,
+								lineHeight: 1.33,
+								color: '#000',
+							}}
+						>
+							{__('Pick an asset from Air')}
+						</p>
+						<button
+							type="button"
+							onClick={handleOpenModal}
+							style={{
+								background: '#0563e9',
+								color: '#fff',
+								border: 'none',
+								borderRadius: 8,
+								padding: '6px 12px',
+								height: 32,
+								boxSizing: 'border-box',
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								gap: 6,
+								width: '100%',
+								fontFamily: 'Inter, sans-serif',
+								fontWeight: 600,
+								fontSize: 14,
+								lineHeight: 1.43,
+								cursor: 'pointer',
+							}}
+						>
+							<PlusIcon />
+							{__('Add asset')}
+						</button>
+					</div>
+				</div>
 			)}
-			{url && (
-				<figure>
-					<img src={url} alt={caption || ''} />
-					{caption && <figcaption>{caption}</figcaption>}
+
+			{asset && (
+				<>
+					<BlockControls>
+						<ToolbarGroup>
+							<ToolbarButton onClick={handleOpenModal}>
+								{__('Replace')}
+							</ToolbarButton>
+						</ToolbarGroup>
+					</BlockControls>
+
+					<InspectorControls>
+						<PanelBody title={__('Upload media')} initialOpen={true}>
+							<div
+								style={{
+									display: 'flex',
+									gap: 8,
+									alignItems: 'flex-start',
+									marginBottom: 12,
+								}}
+							>
+								{asset.urls?.thumbnail && (
+									<img
+										src={asset.urls.thumbnail}
+										alt=""
+										style={{
+											width: 47,
+											height: 76,
+											objectFit: 'cover',
+											borderRadius: 0,
+											flexShrink: 0,
+										}}
+									/>
+								)}
+								<div
+									style={{
+										display: 'flex',
+										flexDirection: 'column',
+										gap: 8,
+										minWidth: 0,
+									}}
+								>
+									<button
+										type="button"
+										onClick={handleOpenModal}
+										style={{ ...INSPECTOR_BUTTON_STYLE, width: 119 }}
+									>
+										{__('Replace image')}
+									</button>
+									<div
+										style={{
+											display: 'flex',
+											gap: 6,
+											alignItems: 'center',
+										}}
+									>
+										{(asset.urls?.airDetail || asset.urls?.selected) && (
+											<a
+												href={asset.urls.airDetail || asset.urls.selected}
+												target="_blank"
+												rel="noopener noreferrer"
+												style={{ ...INSPECTOR_BUTTON_STYLE, width: 113, textDecoration: 'none' }}
+											>
+												{__('View in Air')}
+												<GoToIcon />
+											</a>
+										)}
+										<span
+											style={{
+												display: 'inline-flex',
+												alignItems: 'center',
+												gap: 4,
+												padding: '1px 4px',
+												borderRadius: 4,
+												fontFamily: 'Inter, sans-serif',
+												fontWeight: 500,
+												fontSize: 12,
+												color: '#297c3b',
+												letterSpacing: '0.6px',
+												whiteSpace: 'nowrap',
+											}}
+										>
+											<SyncedIcon />
+											{__('Synced')}
+										</span>
+									</div>
+								</div>
+							</div>
+							<TextareaControl
+								label={__('Alt text')}
+								value={altText}
+								onChange={(value) => setAttributes({ altText: value })}
+								help={__('Describe the purpose of the image')}
+								__nextHasNoMarginBottom
+							/>
+						</PanelBody>
+
+						{asset.type !== 'video' && (
+							<PanelBody title={__('Image options')} initialOpen={true}>
+								<SelectControl
+									label={__('Resolution')}
+									value={resolution}
+									options={RESOLUTION_OPTIONS}
+									onChange={(value) => setAttributes({ resolution: value })}
+									__nextHasNoMarginBottom
+								/>
+								<div style={{ marginTop: 16 }}>
+									<div
+										style={{
+											fontFamily: 'Inter, sans-serif',
+											fontWeight: 700,
+											fontSize: 10,
+											color: '#666',
+											textTransform: 'uppercase',
+											letterSpacing: '0.4px',
+											marginBottom: 8,
+										}}
+									>
+										{__('Resize image')}
+									</div>
+									<div
+										style={{
+											display: 'flex',
+											gap: 4,
+											alignItems: 'center',
+										}}
+									>
+										<div
+											style={{
+												display: 'flex',
+												alignItems: 'center',
+												gap: 4,
+												flex: 1,
+											}}
+										>
+											<label htmlFor="air-resize-w" style={{ fontSize: 12, color: '#666' }}>
+												W
+											</label>
+											<input
+												id="air-resize-w"
+												type="number"
+												value={displayWidth ?? asset.width ?? ''}
+												onChange={(e) => {
+													const raw = e.target.value;
+													if (raw === '') {
+														setAttributes({ displayWidth: undefined, displayHeight: undefined });
+														return;
+													}
+													const newW = Number(raw);
+													const baseW = asset.width;
+													const baseH = asset.height;
+													if (baseW && baseH) {
+														setAttributes({
+															displayWidth: newW,
+															displayHeight: Math.round((newW * baseH) / baseW),
+														});
+													} else {
+														setAttributes({ displayWidth: newW });
+													}
+												}}
+												style={{ width: '100%', minWidth: 0 }}
+											/>
+										</div>
+										<LockIcon />
+										<div
+											style={{
+												display: 'flex',
+												alignItems: 'center',
+												gap: 4,
+												flex: 1,
+											}}
+										>
+											<label htmlFor="air-resize-h" style={{ fontSize: 12, color: '#666' }}>
+												H
+											</label>
+											<input
+												id="air-resize-h"
+												type="number"
+												value={displayHeight ?? asset.height ?? ''}
+												onChange={(e) => {
+													const raw = e.target.value;
+													if (raw === '') {
+														setAttributes({ displayWidth: undefined, displayHeight: undefined });
+														return;
+													}
+													const newH = Number(raw);
+													const baseW = asset.width;
+													const baseH = asset.height;
+													if (baseW && baseH) {
+														setAttributes({
+															displayHeight: newH,
+															displayWidth: Math.round((newH * baseW) / baseH),
+														});
+													} else {
+														setAttributes({ displayHeight: newH });
+													}
+												}}
+												style={{ width: '100%', minWidth: 0 }}
+											/>
+										</div>
+										<span
+											style={{
+												fontFamily: 'Inter, sans-serif',
+												fontWeight: 500,
+												fontSize: 12,
+												color: '#808080',
+												letterSpacing: '0.6px',
+												paddingLeft: 4,
+											}}
+										>
+											8MB
+										</span>
+									</div>
+								</div>
+							</PanelBody>
+						)}
+					</InspectorControls>
+				</>
+			)}
+
+			{isOpen &&
+				createPortal(
+					/* Portalled to document.body to escape the editor stacking context */
+					<>
+						{/* Backdrop — a button so click-outside is keyboard-accessible */}
+						<button
+							type="button"
+							aria-label={__('Close Air asset picker')}
+							onClick={handleCloseModal}
+							style={{
+								position: 'fixed',
+								inset: 0,
+								zIndex: 100000,
+								width: '100%',
+								height: '100%',
+								background: 'rgba(0, 0, 0, 0.5)',
+								border: 'none',
+								cursor: 'default',
+								padding: 0,
+							}}
+						/>
+						{/* Dialog — sits above the backdrop */}
+						<div
+							role="dialog"
+							aria-modal="true"
+							aria-label={__('Air asset picker')}
+							style={{
+								position: 'fixed',
+								inset: 0,
+								zIndex: 100001,
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								pointerEvents: 'none',
+							}}
+						>
+							{pendingAuthUrl && (
+								<div
+									style={{
+										position: 'absolute',
+										top: 16,
+										left: '50%',
+										transform: 'translateX(-50%)',
+										zIndex: 1,
+										pointerEvents: 'auto',
+									}}
+								>
+									<Notice status="info" isDismissible={false}>
+										<a
+											href={pendingAuthUrl}
+											target="_blank"
+											rel="noopener noreferrer"
+											onClick={() => setPendingAuthUrl(null)}
+										>
+											{__('Open sign-in in a new tab →')}
+										</a>
+									</Notice>
+								</div>
+							)}
+							<iframe
+								title="Air asset picker"
+								src={AIR_PICKER_ORIGIN}
+								ref={airFrame}
+								sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms"
+								style={{
+									width: '90vw',
+									maxWidth: '1200px',
+									height: '85vh',
+									border: 'none',
+									display: 'block',
+									borderRadius: '16px',
+									background: '#EFEFEF',
+									boxShadow:
+										'0 8px 11px 0 rgba(0,0,0,0.00), 0 0 8px 0 rgba(0,0,0,0.20), 0 0 16px 0 rgba(0,0,0,0.30)',
+									pointerEvents: 'auto',
+								}}
+							/>
+						</div>
+					</>,
+					document.body
+				)}
+
+			{asset && displayUrl && (
+				<figure style={{ margin: '16px 0' }}>
+					{(() => {
+						// For non-full resolutions, the imgix URL is already sized; the rendered
+						// <img> must match those dimensions so the image isn't upscaled back to
+						// its intrinsic size. `full` resolution falls through to user-resized
+						// (displayWidth/Height) or the asset's intrinsic dims.
+						const resolutionDims = getRenderedDimensionsForResolution(
+							resolution,
+							asset.width,
+							asset.height,
+						);
+						const w = resolutionDims.width ?? displayWidth ?? asset.width;
+						const h = resolutionDims.height ?? displayHeight ?? asset.height;
+						const previewStyle = {};
+						if (w) {
+							previewStyle.width = `${w}px`;
+						}
+						if (h) {
+							previewStyle.height = `${h}px`;
+						}
+						if (w && h) {
+							previewStyle.maxWidth = '100%';
+						}
+						return asset.type === 'video' ? (
+							<video
+								src={displayUrl}
+								controls
+								poster={asset.urls?.thumbnail}
+								style={previewStyle}
+							/>
+						) : (
+							<img
+								src={displayUrl}
+								alt={altText || asset.alt || ''}
+								style={previewStyle}
+							/>
+						);
+					})()}
+					{asset.caption && (
+						<figcaption
+							style={{
+								fontSize: '13px',
+								color: '#666',
+								marginTop: '8px',
+							}}
+						>
+							{asset.caption}
+						</figcaption>
+					)}
 				</figure>
 			)}
 		</div>

@@ -354,19 +354,93 @@
 
 <script>
     // ── Sample assets — swap for real Air API calls when available ────────────
+    // Shape mirrors the air.asset type from sanity-plugin-air:
+    // { assetId, type, alt, caption, urls: { thumbnail, static, dynamic, selected }, width, height }
     const ASSETS = [
-        { id: 1,  name: "Hero Banner",      type: "image",    url: "https://picsum.photos/seed/air1/400/400", caption: "Hero banner image" },
-        { id: 2,  name: "Product Shot A",   type: "image",    url: "https://picsum.photos/seed/air2/400/400", caption: "Product shot A" },
-        { id: 3,  name: "Product Shot B",   type: "image",    url: "https://picsum.photos/seed/air3/400/400", caption: "Product shot B" },
-        { id: 4,  name: "Team Photo",       type: "image",    url: "https://picsum.photos/seed/air4/400/400", caption: "Team photo" },
-        { id: 5,  name: "Brand Logo",       type: "image",    url: "https://picsum.photos/seed/air5/400/400", caption: "Brand logo" },
-        { id: 6,  name: "Campaign Visual",  type: "image",    url: "https://picsum.photos/seed/air6/400/400", caption: "Campaign visual" },
-        { id: 7,  name: "Lifestyle Shot",   type: "image",    url: "https://picsum.photos/seed/air7/400/400", caption: "Lifestyle shot" },
-        { id: 8,  name: "Event Recap",      type: "image",    url: "https://picsum.photos/seed/air8/400/400", caption: "Event recap photo" },
-        { id: 9,  name: "Product Video",    type: "video",    url: "https://example.com/video.mp4",           caption: "Product video" },
-        { id: 10, name: "Brand Guidelines", type: "document", url: "https://example.com/guidelines.pdf",      caption: "Brand guidelines PDF" },
-        { id: 11, name: "Q1 Lookbook",      type: "document", url: "https://example.com/lookbook.pdf",        caption: "Q1 lookbook" },
-        { id: 12, name: "Promo Reel",       type: "video",    url: "https://example.com/promo.mp4",           caption: "Promo reel" },
+        {
+            id: 1, name: "Hero Banner", type: "image",
+            assetId: "mock-asset-001",
+            alt: "Hero banner image", caption: "Hero banner image",
+            urls: { thumbnail: "https://picsum.photos/seed/air1/400/400", static: "https://picsum.photos/seed/air1/1200/800", dynamic: null, selected: "https://picsum.photos/seed/air1/1200/800" },
+            width: 1200, height: 800,
+        },
+        {
+            id: 2, name: "Product Shot A", type: "image",
+            assetId: "mock-asset-002",
+            alt: "Product shot A", caption: "Product shot A",
+            urls: { thumbnail: "https://picsum.photos/seed/air2/400/400", static: "https://picsum.photos/seed/air2/1200/800", dynamic: null, selected: "https://picsum.photos/seed/air2/1200/800" },
+            width: 1200, height: 800,
+        },
+        {
+            id: 3, name: "Product Shot B", type: "image",
+            assetId: "mock-asset-003",
+            alt: "Product shot B", caption: "Product shot B",
+            urls: { thumbnail: "https://picsum.photos/seed/air3/400/400", static: "https://picsum.photos/seed/air3/1200/800", dynamic: null, selected: "https://picsum.photos/seed/air3/1200/800" },
+            width: 1200, height: 800,
+        },
+        {
+            id: 4, name: "Team Photo", type: "image",
+            assetId: "mock-asset-004",
+            alt: "Team photo", caption: "Team photo",
+            urls: { thumbnail: "https://picsum.photos/seed/air4/400/400", static: "https://picsum.photos/seed/air4/1200/800", dynamic: null, selected: "https://picsum.photos/seed/air4/1200/800" },
+            width: 1200, height: 800,
+        },
+        {
+            id: 5, name: "Brand Logo", type: "image",
+            assetId: "mock-asset-005",
+            alt: "Brand logo", caption: "Brand logo",
+            urls: { thumbnail: "https://picsum.photos/seed/air5/400/400", static: "https://picsum.photos/seed/air5/800/800", dynamic: null, selected: "https://picsum.photos/seed/air5/800/800" },
+            width: 800, height: 800,
+        },
+        {
+            id: 6, name: "Campaign Visual", type: "image",
+            assetId: "mock-asset-006",
+            alt: "Campaign visual", caption: "Campaign visual",
+            urls: { thumbnail: "https://picsum.photos/seed/air6/400/400", static: "https://picsum.photos/seed/air6/1200/675", dynamic: "https://picsum.photos/seed/air6/1200/675", selected: "https://picsum.photos/seed/air6/1200/675" },
+            width: 1200, height: 675,
+        },
+        {
+            id: 7, name: "Lifestyle Shot", type: "image",
+            assetId: "mock-asset-007",
+            alt: "Lifestyle shot", caption: "Lifestyle shot",
+            urls: { thumbnail: "https://picsum.photos/seed/air7/400/400", static: "https://picsum.photos/seed/air7/1200/800", dynamic: null, selected: "https://picsum.photos/seed/air7/1200/800" },
+            width: 1200, height: 800,
+        },
+        {
+            id: 8, name: "Event Recap", type: "image",
+            assetId: "mock-asset-008",
+            alt: "Event recap photo", caption: "Event recap photo",
+            urls: { thumbnail: "https://picsum.photos/seed/air8/400/400", static: "https://picsum.photos/seed/air8/1200/800", dynamic: null, selected: "https://picsum.photos/seed/air8/1200/800" },
+            width: 1200, height: 800,
+        },
+        {
+            id: 9, name: "Product Video", type: "video",
+            assetId: "mock-asset-009",
+            alt: "Product video", caption: "Product video",
+            urls: { thumbnail: "https://picsum.photos/seed/air9/400/225", static: "https://example.com/video.mp4", dynamic: null, selected: "https://example.com/video.mp4" },
+            width: 1920, height: 1080,
+        },
+        {
+            id: 10, name: "Brand Guidelines", type: "document",
+            assetId: "mock-asset-010",
+            alt: "", caption: "Brand guidelines PDF",
+            urls: { thumbnail: null, static: "https://example.com/guidelines.pdf", dynamic: null, selected: "https://example.com/guidelines.pdf" },
+            width: null, height: null,
+        },
+        {
+            id: 11, name: "Q1 Lookbook", type: "document",
+            assetId: "mock-asset-011",
+            alt: "", caption: "Q1 lookbook",
+            urls: { thumbnail: null, static: "https://example.com/lookbook.pdf", dynamic: null, selected: "https://example.com/lookbook.pdf" },
+            width: null, height: null,
+        },
+        {
+            id: 12, name: "Promo Reel", type: "video",
+            assetId: "mock-asset-012",
+            alt: "Promo reel", caption: "Promo reel",
+            urls: { thumbnail: "https://picsum.photos/seed/air12/400/225", static: "https://example.com/promo.mp4", dynamic: null, selected: "https://example.com/promo.mp4" },
+            width: 1920, height: 1080,
+        },
     ];
 
     const SESSION_KEY = 'air_mock_session';
@@ -452,9 +526,13 @@
         document.getElementById('insert-btn').addEventListener('click', () => {
             if (!selectedAsset) return;
             const payload = {
-                url:            selectedAsset.url,
-                caption:        selectedAsset.caption,
-                other_metadata: { type: selectedAsset.type, name: selectedAsset.name },
+                assetId: selectedAsset.assetId,
+                type:    selectedAsset.type,
+                alt:     selectedAsset.alt,
+                caption: selectedAsset.caption,
+                urls:    selectedAsset.urls,
+                width:   selectedAsset.width,
+                height:  selectedAsset.height,
             };
             console.log('Sending asset to WordPress:', payload);
             window.parent.postMessage(JSON.stringify(payload), '*');
@@ -482,8 +560,9 @@
             const card  = document.createElement('div');
             card.className = 'asset-card' + (selectedAsset?.id === asset.id ? ' selected' : '');
 
-            const thumb = asset.type === 'image'
-                ? `<img src="${asset.url}" alt="${asset.name}" loading="lazy" />`
+            const thumbUrl = asset.urls?.thumbnail;
+            const thumb = thumbUrl
+                ? `<img src="${thumbUrl}" alt="${asset.alt || asset.name}" loading="lazy" />`
                 : `<div style="width:100%;aspect-ratio:1;background:#eee;display:flex;align-items:center;justify-content:center;font-size:32px;">${asset.type === 'video' ? '🎬' : '📄'}</div>`;
 
             card.innerHTML = `${thumb}<div class="check">✓</div>

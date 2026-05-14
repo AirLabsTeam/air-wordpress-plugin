@@ -1,18 +1,34 @@
 {
-	"name": "air-wordpress-plugin",
-	"version": "0.1.0",
+	"name": "air-asset-picker",
+	"version": "0.3.0",
 	"description": "Air asset picker block for WordPress",
 	"author": "Air.inc",
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",
+	"files": [
+		"air-asset-picker.php",
+		"readme.txt",
+		"build"
+	],
 	"scripts": {
 		"build": "wp-scripts build",
-		"format": "wp-scripts format",
+		"build:dev": "APP_ENV=development wp-scripts build",
+		"build:qa": "APP_ENV=qa wp-scripts build",
+		"build:prod": "APP_ENV=production wp-scripts build",
+		"start": "wp-scripts start",
+		"start:dev": "APP_ENV=development wp-scripts start",
+		"start:qa": "APP_ENV=qa wp-scripts start",
+		"start:prod": "APP_ENV=production wp-scripts start",
+		"wp:dev": "npm run build:dev && yarn dlx @wordpress/env start",
+		"wp:qa": "npm run build:qa && yarn dlx @wordpress/env start",
+		"wp:prod": "npm run build:prod && yarn dlx @wordpress/env start",
+		"format": "biome format --write .",
+		"format:check": "biome format .",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip",
-		"start": "wp-scripts start"
+		"dist:zip": "bin/build-dist-zip.sh"
 	},
 	"devDependencies": {
 		"@babel/runtime": "7.29.2",
