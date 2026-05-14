@@ -28,7 +28,7 @@ function airpicker_register_block() {
 	register_block_type( __DIR__ . '/build' );
 
 	wp_localize_script(
-		'air-inc-asset-picker-editor-script',
+		'airpicker-asset-picker-editor-script',
 		'airpickerData',
 		array(
 			'workspaceId' => get_option( 'airpicker_workspace_id', defined( 'AIRPICKER_WORKSPACE_ID' ) ? AIRPICKER_WORKSPACE_ID : '' ),

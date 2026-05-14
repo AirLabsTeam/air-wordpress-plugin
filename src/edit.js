@@ -45,10 +45,10 @@ function sendToIframe(iframeWindow, type, data = {}) {
 }
 
 const RESOLUTION_OPTIONS = [
-	{ label: __('Full size'), value: 'full' },
-	{ label: __('Large'), value: 'large' },
-	{ label: __('Medium'), value: 'medium' },
-	{ label: __('Thumbnail'), value: 'thumbnail' },
+	{ label: __('Full size', 'air-asset-picker'), value: 'full' },
+	{ label: __('Large', 'air-asset-picker'), value: 'large' },
+	{ label: __('Medium', 'air-asset-picker'), value: 'medium' },
+	{ label: __('Thumbnail', 'air-asset-picker'), value: 'thumbnail' },
 ];
 
 const SyncedIcon = () => (
@@ -141,7 +141,6 @@ export default function Edit({
 			}
 
 			if (message.origin !== AIR_PICKER_ORIGIN) {
-				console.warn('[Air] Untrusted postMessage origin:', message.origin);
 				return;
 			}
 
@@ -289,7 +288,7 @@ export default function Edit({
 									color: '#000',
 								}}
 							>
-								{__('Air')}
+								{__('Air', 'air-asset-picker')}
 							</span>
 						</div>
 						<p
@@ -302,7 +301,7 @@ export default function Edit({
 								color: '#000',
 							}}
 						>
-							{__('Pick an asset from Air')}
+							{__('Pick an asset from Air', 'air-asset-picker')}
 						</p>
 						<button
 							type="button"
@@ -328,7 +327,7 @@ export default function Edit({
 							}}
 						>
 							<PlusIcon />
-							{__('Add asset')}
+							{__('Add asset', 'air-asset-picker')}
 						</button>
 					</div>
 				</div>
@@ -339,13 +338,13 @@ export default function Edit({
 					<BlockControls>
 						<ToolbarGroup>
 							<ToolbarButton onClick={handleOpenModal}>
-								{__('Replace')}
+								{__('Replace', 'air-asset-picker')}
 							</ToolbarButton>
 						</ToolbarGroup>
 					</BlockControls>
 
 					<InspectorControls>
-						<PanelBody title={__('Upload media')} initialOpen={true}>
+						<PanelBody title={__('Upload media', 'air-asset-picker')} initialOpen={true}>
 							<div
 								style={{
 									display: 'flex',
@@ -380,7 +379,7 @@ export default function Edit({
 										onClick={handleOpenModal}
 										style={{ ...INSPECTOR_BUTTON_STYLE, width: 119 }}
 									>
-										{__('Replace image')}
+										{__('Replace image', 'air-asset-picker')}
 									</button>
 									<div
 										style={{
@@ -396,7 +395,7 @@ export default function Edit({
 												rel="noopener noreferrer"
 												style={{ ...INSPECTOR_BUTTON_STYLE, width: 113, textDecoration: 'none' }}
 											>
-												{__('View in Air')}
+												{__('View in Air', 'air-asset-picker')}
 												<GoToIcon />
 											</a>
 										)}
@@ -416,24 +415,24 @@ export default function Edit({
 											}}
 										>
 											<SyncedIcon />
-											{__('Synced')}
+											{__('Synced', 'air-asset-picker')}
 										</span>
 									</div>
 								</div>
 							</div>
 							<TextareaControl
-								label={__('Alt text')}
+								label={__('Alt text', 'air-asset-picker')}
 								value={altText}
 								onChange={(value) => setAttributes({ altText: value })}
-								help={__('Describe the purpose of the image')}
+								help={__('Describe the purpose of the image', 'air-asset-picker')}
 								__nextHasNoMarginBottom
 							/>
 						</PanelBody>
 
 						{asset.type !== 'video' && (
-							<PanelBody title={__('Image options')} initialOpen={true}>
+							<PanelBody title={__('Image options', 'air-asset-picker')} initialOpen={true}>
 								<SelectControl
-									label={__('Resolution')}
+									label={__('Resolution', 'air-asset-picker')}
 									value={resolution}
 									options={RESOLUTION_OPTIONS}
 									onChange={(value) => setAttributes({ resolution: value })}
@@ -451,7 +450,7 @@ export default function Edit({
 											marginBottom: 8,
 										}}
 									>
-										{__('Resize image')}
+										{__('Resize image', 'air-asset-picker')}
 									</div>
 									<div
 										style={{
@@ -560,7 +559,7 @@ export default function Edit({
 						{/* Backdrop — a button so click-outside is keyboard-accessible */}
 						<button
 							type="button"
-							aria-label={__('Close Air asset picker')}
+							aria-label={__('Close Air asset picker', 'air-asset-picker')}
 							onClick={handleCloseModal}
 							style={{
 								position: 'fixed',
@@ -578,7 +577,7 @@ export default function Edit({
 						<div
 							role="dialog"
 							aria-modal="true"
-							aria-label={__('Air asset picker')}
+							aria-label={__('Air asset picker', 'air-asset-picker')}
 							style={{
 								position: 'fixed',
 								inset: 0,
@@ -607,7 +606,7 @@ export default function Edit({
 											rel="noopener noreferrer"
 											onClick={() => setPendingAuthUrl(null)}
 										>
-											{__('Open sign-in in a new tab →')}
+											{__('Open sign-in in a new tab →', 'air-asset-picker')}
 										</a>
 									</Notice>
 								</div>
