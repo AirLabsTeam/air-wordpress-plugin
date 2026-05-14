@@ -3,7 +3,7 @@ Contributors: airinc
 Tags: digital asset management, dam, brand assets, media library, block editor
 Requires at least: 6.3
 Tested up to: 6.9
-Stable tag: 0.2.13
+Stable tag: 0.3.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -89,7 +89,33 @@ This plugin connects to Air (https://air.inc) to enable asset selection and embe
 * Air Terms of Service: [https://air.inc/terms](https://air.inc/terms)
 * Air Privacy Policy: [https://air.inc/privacy](https://air.inc/privacy)
 
+== Source Code ==
+
+The compiled JavaScript shipped in `/build` is generated from human-readable sources in `/src` using `@wordpress/scripts` (webpack). The full source code, build configuration, and development instructions are publicly available at:
+
+[https://github.com/AirLabsTeam/air-wordpress-plugin](https://github.com/AirLabsTeam/air-wordpress-plugin)
+
+**Build prerequisites:**
+
+* Node.js 22 or later
+* npm 10 or later (or Yarn 1.x)
+
+**Build steps:**
+
+`git clone https://github.com/AirLabsTeam/air-wordpress-plugin.git`
+`cd air-wordpress-plugin`
+`npm install`
+`npm run build:prod`
+
+The build outputs `/build/index.js`, `/build/index.asset.php`, and `/build/block.json` — the exact files shipped in the WordPress.org zip. No third-party minified libraries are bundled; all dependencies are sourced from `@wordpress/*` packages provided by WordPress core.
+
 == Changelog ==
+
+= 0.3.0 =
+* WordPress.org compliance: renamed PHP function/option/define/admin-page prefixes from `air_inc`/`air` to `airpicker` (4+ char prefix requirement). Renamed localized JS global from `airAssetPickerData` to `airpickerData`. Added one-shot migration that copies the legacy `air_workspace_id` option to `airpicker_workspace_id` on activation and on `plugins_loaded` so existing installs retain their workspace ID without manual reconfiguration.
+* Renamed main plugin file from `index.php` to `air-asset-picker.php` to match the plugin slug.
+* Documented the public source repository and build instructions in the readme so reviewers and downstream developers can rebuild `/build/index.js` from `/src`.
+* Plugin zip no longer ships the WordPress.org directory assets (`/assets`), webpack/biome configs, or `node_modules` — added `.distignore` so only runtime files (`air-asset-picker.php`, `readme.txt`, `/build`) are distributed.
 
 = 0.2.13 =
 * Removed the `Plugin URI` header; the WordPress.org submission form requires the plugin and author URIs to be distinct.
@@ -145,6 +171,9 @@ This plugin connects to Air (https://air.inc) to enable asset selection and embe
 * Image and video asset support with Air CDN delivery
 
 == Upgrade Notice ==
+
+= 0.3.0 =
+WordPress.org compliance pass: prefix rename (`air_inc` → `airpicker`), main file rename, and ship-only-runtime zip. Legacy workspace ID is migrated automatically on activation.
 
 = 0.2.13 =
 Submission-form fix: removed duplicate plugin/author URI.

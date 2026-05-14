@@ -1,0 +1,30 @@
+# wp-scripts plugin-zip excludes anything matched here.
+# Only `air-asset-picker.php`, `readme.txt`, and `/build` should ship.
+
+# WordPress.org directory assets — uploaded to SVN /assets after approval, NOT in zip.
+/assets
+
+# Source — compiled to /build via webpack.
+/src
+
+# Local dev / build tooling
+/node_modules
+/blueprints
+/air-picker
+/.github
+/.git
+.env
+.env.*
+.gitignore
+.gitattributes
+.distignore
+.editorconfig
+biome.json
+webpack.config.js
+package.json
+package-lock.json
+yarn.lock
+docker-compose.yml
+README.md
+*.log
+.DS_Store

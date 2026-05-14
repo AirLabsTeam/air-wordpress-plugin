@@ -4,7 +4,7 @@ import metadata from './block.json';
 import Edit from './edit';
 import save from './save';
 
-const pluginUrl = (window.airAssetPickerData && window.airAssetPickerData.pluginUrl) || '';
+const pluginUrl = (window.airpickerData && window.airpickerData.pluginUrl) || '';
 
 const icon = pluginUrl
 	? createElement('img', {

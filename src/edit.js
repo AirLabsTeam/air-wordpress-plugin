@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { AIR_PICKER_ORIGIN, AIR_WORKSPACE_ID } from './constants';
 import { getDisplayUrlForResolution, getRenderedDimensionsForResolution } from './utils';
 
-const pluginUrl = (window.airAssetPickerData && window.airAssetPickerData.pluginUrl) || '';
+const pluginUrl = (window.airpickerData && window.airpickerData.pluginUrl) || '';
 
 const PlusIcon = () => (
 	<svg

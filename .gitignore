@@ -2,6 +2,9 @@ build
 node_modules
 .yarn/install-state.gz
 
+# WP.org dist zip — built via `npm run dist:zip`, attached to GitHub Releases
+*.zip
+
 # WordPress
 .wp-env.json
 
